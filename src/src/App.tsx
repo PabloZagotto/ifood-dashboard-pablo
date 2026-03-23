@@ -13,3 +13,32 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = authService.isAuthenticated();
+      setIsAuthenticated(auth);
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
+
+  if (loading) return <div>Carregando...</div>;
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+          <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
